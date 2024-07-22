@@ -11,4 +11,3 @@ from .build_memsam import (
     build_memsam_vit_b,
     memsam_model_registry,
 )
-from .automatic_mask_generator import SamAutomaticMaskGenerator

@@ -41,7 +41,19 @@ python utils/preprocess_echonet.py -i /data/dengxiaolong/EchoNet-Dynamic -o /dat
 
 ### train and test
 Use `train_video.py` and `test_video.py` to train and test separately.
+```
+# train
+python train_video.py --modelname MemSAM --task CAMUS_Video_Full [--keep_log]
+python train_video.py --modelname MemSAM --task CAMUS_Video_Semi 
+python train_video.py --modelname MemSAM --task EchoNet_Video 
+# test
+python test_video.py --modelname MemSAM --task select_one_task --ckpt_path your_checkpoint_path
+```
 
+### launch tensorboard
+```
+tensorboard --logdir=tensorboard
+```
 ## Acknowledgement
 The work is based on [SAM](https://github.com/facebookresearch/segment-anything), [SAMUS](https://github.com/xianlin7/SAMUS) and [XMem](https://github.com/hkchengrex/XMem). Thanks for the open source contributions to these efforts!
 

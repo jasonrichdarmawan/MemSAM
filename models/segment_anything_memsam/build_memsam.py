@@ -101,9 +101,9 @@ def _build_memsam(
                 "key_dim": 64,
                 "value_dim": 256,
                 "hidden_dim": 64,
-                "reinforce":args.reinforce,
+                "reinforce":args.disable_reinforce,
             },
-        ) if args.enable_memory else None
+        ) if not args.disable_memory else None
     )
     sam.eval()
     if checkpoint is not None:

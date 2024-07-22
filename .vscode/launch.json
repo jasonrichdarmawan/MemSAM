@@ -1,0 +1,70 @@
+{
+    // 使用 IntelliSense 了解相关属性。 
+    // 悬停以查看现有属性的描述。
+    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "train_video.py CAMUS_Video_Full",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "train_video.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--task", "CAMUS_Video_Full",
+                "--warmup",
+                "--keep_log"
+            ]
+        },
+        {
+            "name": "train_video.py CAMUS_Video_Semi",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "train_video.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--task", "CAMUS_Video_Semi",
+                "--warmup",
+                "--keep_log",
+            ]
+        },
+        {
+            "name": "train_video.py EchoNet_Video",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "train_video.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--task", "EchoNet_Video",
+                "--warmup",
+                "--keep_log",
+            ]
+        },
+        {
+            "name": "test_video.py CAMUS_Video_Full",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "test_video.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--modelname", "MemSAM",
+                "--task", "CAMUS_Video_Full",
+                "--ckpt_path", "checkpoints/CAMUS_Video_Full/MemSAM_07211250_89_0.9296098086897039.pth",
+                "--compute_ef",
+            ]
+        },
+        {
+            "name": "test_video.py CAMUS_Video_Semi",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "test_video.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--modelname", "MemSAM",
+                "--task", "CAMUS_Video_Semi",
+                "--ckpt_path", "checkpoints/CAMUS_Video_Semi/MemSAM_07200127_46_0.9286609719464971.pth",
+                "--compute_ef",
+            ]
+        },
+    ]
+}
