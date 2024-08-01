@@ -1,34 +1,18 @@
-from ast import arg
-import os
-
-# os.environ["CUDA_VISIBLE_DEVICES"] = '0'
 import argparse
-from pickle import FALSE, TRUE
-from statistics import mode
-from tkinter import image_names
-import torch
-import torchvision
-from torch import nn
-from torch.autograd import Variable
-from torch.utils.data import DataLoader
-import torch.optim as optim
+import os
+import random
+import time
+
 import numpy as np
 import torch
+from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
-import time
-import random
-from utils.config import get_config
-from utils.evaluation import get_eval
-from importlib import import_module
 
-from torch.nn.modules.loss import CrossEntropyLoss
-from monai.losses import DiceCELoss
-from einops import rearrange
 from models.model_dict import get_model
-from utils.data_us import EchoVideoDataset, JointTransform3D, EchoDataset
+from utils.config import get_config
+from utils.data_us import EchoDataset, EchoVideoDataset, JointTransform3D
+from utils.evaluation import get_eval
 from utils.loss_functions.sam_loss import get_criterion
-from utils.generate_prompts import get_click_prompt
-from easydict import EasyDict
 
 
 def parse_args():

@@ -1,25 +1,32 @@
-from tkinter import image_names
+import os
+
+import numpy as np
 from torch.autograd import Variable
 from torch.utils.data import DataLoader
-import os
-import numpy as np
+
 np.seterr(divide='ignore', invalid='ignore')
+import time
+
 import torch
 import torch.nn.functional as F
-import utils.metrics as metrics
+from einops import rearrange
 from hausdorff import hausdorff_distance
+from medpy.metric.binary import assd as medpy_assd
 from medpy.metric.binary import hd as medpy_hd
 from medpy.metric.binary import hd95 as medpy_hd95
-from medpy.metric.binary import assd as medpy_assd
-from utils.tools import hausdorff_distance as our_hausdorff_distance
-from utils.visualization import visual_segmentation, visual_segmentation_npy, visual_segmentation_binary, visual_segmentation_sets, visual_segmentation_sets_with_pt
-from einops import rearrange
-from utils.generate_prompts import get_click_prompt
-from utils.compute_ef import compute_left_ventricle_volumes
-import time
-import pandas as pd
-from utils.tools import corr, bias, std
 from scipy import stats
+
+import utils.metrics as metrics
+from utils.compute_ef import compute_left_ventricle_volumes
+from utils.generate_prompts import get_click_prompt
+from utils.tools import bias, corr
+from utils.tools import hausdorff_distance as our_hausdorff_distance
+from utils.tools import std
+from utils.visualization import (visual_segmentation,
+                                 visual_segmentation_binary,
+                                 visual_segmentation_npy,
+                                 visual_segmentation_sets,
+                                 visual_segmentation_sets_with_pt)
 
 
 def eval_camus(valloader, model, criterion, opt, args):
@@ -48,12 +55,12 @@ def eval_camus(valloader, model, criterion, opt, args):
         else:
             pt = get_click_prompt(datapack, opt)
 
-        start = time.time()
+        # start = time.time()
         with torch.no_grad():
             pred = model(imgs, pt, None)
-        end = time.time()
-        print('infer_time:', (end-start))
-        sum_time = sum_time + (end-start)
+        # end = time.time()
+        # print('infer_time:', (end-start))
+        # sum_time = sum_time + (end-start)
 
         val_loss = criterion(pred[:,opt.pred_idx,0], masks[:,opt.label_idx])
         pred = pred[:,opt.pred_idx, 0]
@@ -193,38 +200,26 @@ def eval_echonet(valloader, model, criterion, opt, args):
         image_filename = datapack['image_name']
         image_name = image_filename[0].split(".")[0]
 
-        # gt_efs[image_name] = datapack['ef'].detach().cpu().numpy()[0]
+        gt_efs[image_name] = datapack['ef'].detach().cpu().numpy()[0]
         # if args.enable_point_prompt:
         #     # pt[0]: b t 1 2
         #     # pt[1]: t 1
         pt = get_click_prompt(datapack, opt)
         # else:
         # pt = None
-        import time
-        start = time.time()
+
+        # start = time.time()
         with torch.no_grad():
             pred = model(imgs, pt, None)
-        end = time.time()
-        sum_time = sum_time +(end-start)
-        print('infer_time:', end-start)
+        # end = time.time()
+        # sum_time = sum_time +(end-start)
+        # print('infer_time:', end-start)
 
-        # continue
-        if opt.semi:
-            pred = pred[:,[0,-1]]
-            masks = masks[:,[0,-1]]
-        else:
-            # insert fake frame
-            masks_zero = torch.zeros_like(pred,dtype=torch.uint8)
-            masks_zero = masks_zero[:,:,0]
-            masks_zero[:,0] = masks[:,0]
-            masks_zero[:,-1] = masks[:,-1]
-            masks = masks_zero
-
-        # val_loss = criterion(pred[:,:,0], masks)
-        # val_losses += val_loss.item()
+        pred = pred[:, opt.pred_idx,0]
+        masks = masks[:,opt.label_idx]
 
         gt = masks.detach().cpu().numpy()
-        predict = F.sigmoid(pred[:,:,0,:,:])
+        predict = F.sigmoid(pred)
         predict = predict.detach().cpu().numpy()  # (b, t, h, w)
         seg = predict > 0.6
 
@@ -235,7 +230,6 @@ def eval_echonet(valloader, model, criterion, opt, args):
         mask_dict[image_name] = {'ED':seg_mask[0,0], 'ES':seg_mask[0,-1],'spacing':spcaing}
 
         b, t, h, w = seg.shape
-        flag = False
         for j in range(0, b):
             for idx, frame_i in enumerate(range(0,t)):
                 # for idx, frame_i in enumerate([0,t-1]):
@@ -311,12 +305,9 @@ def eval_echonet(valloader, model, criterion, opt, args):
             # compute ef
             pred_efs = {}
             for patient_name in mask_dict:
-                a2c_ed = mask_dict[patient_name]['2CH']['ED']
-                a2c_es = mask_dict[patient_name]['2CH']['ES']
-                a2c_voxelspacing = mask_dict[patient_name]['2CH']['spacing']
-                a4c_ed = mask_dict[patient_name]['4CH']['ED']
-                a4c_es = mask_dict[patient_name]['4CH']['ES']
-                a4c_voxelspacing = mask_dict[patient_name]['4CH']['spacing']
+                a2c_ed = a4c_ed = mask_dict[patient_name]['ED']
+                a2c_es = a4c_es = mask_dict[patient_name]['ES']
+                a2c_voxelspacing = a4c_voxelspacing = mask_dict[patient_name]['spacing']
                 edv, esv = compute_left_ventricle_volumes(
                     a2c_ed=a2c_ed,
                     a2c_es=a2c_es,
@@ -345,6 +336,7 @@ def eval_echonet(valloader, model, criterion, opt, args):
             print(wilcoxon_rank_sum_test)
             print(wilcoxon_signed_rank_test)
         return dice_mean, iou_mean, hd_mean, assd_mean, dices_std, iou_std, hd_std, assd_std
+
 
 def get_eval(val_loader, model, criterion, opt, args):
     if opt.eval_mode == "echonet":

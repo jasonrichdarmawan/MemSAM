@@ -66,5 +66,18 @@
                 "--compute_ef",
             ]
         },
+        {
+            "name": "test_video.py EchoNet_Video",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "test_video.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--modelname", "MemSAM",
+                "--task", "EchoNet_Video",
+                "--ckpt_path", "checkpoints/EchoNet_Video/MemSAM_07300111_86_0.9241842923868253.pth",
+                "--compute_ef",
+            ]
+        }
     ]
 }
