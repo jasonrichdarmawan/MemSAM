@@ -24,7 +24,7 @@ class Config_CAMUS_Video_Full():
 
 
 class Config_CAMUS_Video_Semi():
-    data_path = "/data/dengxiaolong/memsam/CAMUS_public/" # CAMUS dataset path
+    data_path = "./temp_dir/CAMUS_public_256/" # CAMUS dataset path
     save_path = "./checkpoints/CAMUS_Video_Semi/"
     result_path = "./result/CAMUS_Video_Semi/"
     tensorboard_path = "./tensorboard/CAMUS_Video_Semi/"

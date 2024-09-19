@@ -169,6 +169,7 @@ def main():
         point_numbers=opt.point_prompt_number,
         disable_point_prompt=args.disable_point_prompt,
     )
+
     trainloader = DataLoader(
         train_dataset,
         batch_size=args.batch_size,

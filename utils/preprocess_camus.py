@@ -15,8 +15,8 @@ SPLIT_RATIOS = [0.7,0.1,0.2]
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-i', '--input_dir', type=str, default='/data/dengxiaolong/CAMUS_public/database_nifti')
-    parser.add_argument('-o', '--output_dir', type=str, default='/tmp/CAMUS_public_256')
+    parser.add_argument('-i', '--input_dir', type=str, default='./dataset/CAMUS_public/database_nifti')
+    parser.add_argument('-o', '--output_dir', type=str, default='./temp_dir/CAMUS_public_256')
     parser.add_argument('-f', '--split_file', type=str)
     args = parser.parse_args()
 
@@ -73,9 +73,9 @@ def random_split(data:list, ratios:list):
         start += point
     return splits
 
-def split(data:list, ratios:list):
-    total_length = len(data)
-    split_points = [int(ratio * total_length) for ratio in ratios]
+def split(data: list[str], ratios: list[float]):
+    total_length = len(data) # 500
+    split_points = [int(ratio * total_length) for ratio in ratios] # [0.7, 0.1, 0.2]
     splits = []
     start = 0
     for point in split_points:
@@ -126,7 +126,7 @@ def resampleSize(sitkImage, depth):
     sitkImage = sitk.Resample(sitkImage,newsize,euler3d,sitk.sitkNearestNeighbor,origin,newspace,direction)
     return sitkImage
 
-def resampleXYSize(sitkImage, new_xsize, new_ysize):
+def resampleXYSize(sitkImage: sitk.Image, new_xsize, new_ysize):
     '''
         newsitkImage = resampleSize(sitkImage, depth=DEPTH)
     '''
@@ -147,25 +147,34 @@ def resampleXYSize(sitkImage, new_xsize, new_ysize):
     return sitkImage
 
 def compute_ef_to_patient(patient_dir: Path):
-    patient_name = patient_dir.name 
+    patient_name = patient_dir.name # patient0001
     gt_mask_pattern = "{patient_name}_{view}_{instant}_gt.nii.gz"
-    lv_label = 1
+    lv_label = 1 # left ventricle (LV)
 
-    view = "2CH"
-    instant = "ED"
+    # 2CH_ED_gt.nii.gz
+    view = "2CH" # 2-chamber apical view
+    instant = "ED" # end-diastole
     a2c_ed, a2c_info = sitk_load(patient_dir / gt_mask_pattern.format(patient_name=patient_name, view=view, instant=instant))
-    a2c_voxelspacing = a2c_info["spacing"][:2][::-1]    # Extract the (width,height) dimension from the metadata and order them like in the mask
+    # Extract the (width,height) dimension from the metadata and order them like in the mask
+    # Size (in mm)
+    # [::-1] reverse it by -1
+    # [start:stop:step]
+    a2c_voxelspacing = a2c_info["spacing"][:2][::-1]
 
-    instant = "ES"
+    # 2CH_ES_gt.nii.gz
+    instant = "ES" # end-systole
     a2c_es, _ = sitk_load(patient_dir / gt_mask_pattern.format(patient_name=patient_name, view=view, instant=instant))
 
+    # 4CH_ED_gt.nii.gz
     view = "4CH"
     instant = "ED"
     a4c_ed, a4c_info = sitk_load(patient_dir / gt_mask_pattern.format(patient_name=patient_name, view=view, instant=instant))
     a4c_voxelspacing = a4c_info["spacing"][:2][::-1]    # Extract the (width,height) dimension from the metadata and order them like in the mask
 
+    # 4CH_ES
     instant = "ES"
     a4c_es, _ = sitk_load(patient_dir / gt_mask_pattern.format(patient_name=patient_name, view=view, instant=instant))
+    
     # Extract binary LV masks from the multi-class segmentation masks
     a2c_ed_lv_mask = a2c_ed == lv_label
     a2c_es_lv_mask = a2c_es == lv_label
@@ -179,7 +188,7 @@ def compute_ef_to_patient(patient_dir: Path):
     # print(f"{patient_name=}: {ef=}, {edv=}, {esv=}")
     return ef, edv, esv
 
-def preprocess_data(input_path, output_path, split_file):
+def preprocess_data(input_path: str, output_path: str, split_file: str):
     # hyperparam
     resize_size = RESIZE_SIZE
     # generate video name
@@ -208,14 +217,14 @@ def preprocess_data(input_path, output_path, split_file):
 
     for idx, patient_name in enumerate(patient_name_list):
         patient_root = Path(input_path)
-        patient_dir = patient_root / patient_name
+        patient_dir = patient_root / patient_name # ./dataset/CAMUS_public/database_nifti/patient0001
 
         seq_pattern = "{patient_name}_{view}_half_sequence.nii.gz"
         seq_gt_pattern = "{patient_name}_{view}_half_sequence_gt.nii.gz"
-        cfg_pattern = "Info_{view}.cfg"
+        cfg_pattern = "Info_{view}.cfg" # Info_2CH.cfg
         
-        seq_save_pattern = "{patient_name}_{view}.npy"
-        seq_gt_save_pattern = "{patient_name}_{view}.npz"
+        seq_save_pattern = "{patient_name}_{view}.npy" # sequence from videos
+        seq_gt_save_pattern = "{patient_name}_{view}.npz" # annotated sequence
 
         ef, edv, esv = compute_ef_to_patient(patient_dir=patient_dir)
 

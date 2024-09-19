@@ -7,8 +7,8 @@ import logging
 from pathlib import Path
 from typing import Any, Dict, Tuple
 
+import PIL.Image
 import numpy as np
-import PIL
 import SimpleITK as sitk
 from PIL.Image import Resampling
 from skimage.measure import find_contours

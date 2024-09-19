@@ -7,3 +7,6 @@ tensorboard/
 __pycache__/
 test_imgs/
 temp_dir
+.venv
+.python-version
+scribble/

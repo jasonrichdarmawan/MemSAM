@@ -13,11 +13,20 @@ Xiaolong Deng^, [Huisi Wu*](https://csse.szu.edu.cn/staff/~hswu/), [Runhao Zeng]
 <!-- The code will be uploaded later. -->
 
 ## Installation
+
+conda
 ```
 conda create --name memsam python=3.10
 conda activate memsam
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
-pip install requirements.txt
+pip install -r requirements.txt
+```
+
+pyenv
+```
+pyenv install 3.10
+pyenv exec python -m venv .venv
+source .venv/bin/activate
 ```
 
 ## Usage

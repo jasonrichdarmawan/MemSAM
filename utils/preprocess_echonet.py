@@ -34,8 +34,8 @@ CONST.US_MultiviewData must point towards the echonet data folder
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-i', '--input_dir', type=str)
-    parser.add_argument('-o', '--output_dir', type=str)
+    parser.add_argument('-i', '--input_dir', type=str, default="./dataset/EchoNet-Dynamic")
+    parser.add_argument('-o', '--output_dir', type=str, default="./temp_dir/EchoNet")
     parser.add_argument('-kpts', '--save_kpts', type=bool, default=True)
     parser.add_argument('-masks', '--save_masks', type=bool, default=True)
     parser.add_argument('-imgs', '--save_imgs', type=bool, default=True)

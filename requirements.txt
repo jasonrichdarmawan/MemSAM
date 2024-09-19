@@ -14,3 +14,4 @@ matplotlib
 tensorboard
 numba
 seaborn
+medpy
