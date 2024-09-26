@@ -29,6 +29,20 @@ pyenv exec python -m venv .venv
 source .venv/bin/activate
 ```
 
+## Environment specific issue
+
+1. AWS SageMaker
+
+    Error
+    ```
+    ImportError: libGL.so.1: cannot open shared object file: No such file or directory
+    ```
+
+    Solution
+    ```
+    pip install opencv-python-headles
+    ```
+
 ## Usage
 ### prepare dataset
 First, download the dataset from:

@@ -503,6 +503,7 @@ class JointTransform3D:
         image = torch.tensor(image)
         mask = torch.tensor(mask)
 
+        mask[mask == 255] = 1
         # image = F.to_tensor(image)
 
         # if not self.long_mask:
