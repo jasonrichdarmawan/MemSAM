@@ -40,7 +40,7 @@ source .venv/bin/activate
 
     Solution
     ```
-    pip install opencv-python-headles
+    pip install opencv-python-headless
     ```
 
 ## Usage
